@@ -53,13 +53,14 @@ module.exports = function(/*options, callback*/) {
         options.repositories = options.repositories.concat(packageJson.java.repositories);
       }
 
-      if (!packageJson.java.dependencies) {
-        return callback(new Error("Could not find java.dependencies property in package.json"));
-      }
+      var dependencies = packageJson.java.dependencies;
+//       if (!packageJson.java.dependencies) {
+//         return callback(new Error("Could not find java.dependencies property in package.json"));
+//       }
 
-      if (!(packageJson.java.dependencies instanceof Array)) {
-        return callback(new Error("java.dependencies property in package.json must be an array."));
-      }
+//       if (!(packageJson.java.dependencies instanceof Array)) {
+//         return callback(new Error("java.dependencies property in package.json must be an array."));
+//       }
 
       if (packageJson.java.exclusions) {
         if (!(packageJson.java.exclusions instanceof Array)) {
@@ -69,11 +70,13 @@ module.exports = function(/*options, callback*/) {
         }
       }
 
-
-
-      return packageJson.java.dependencies.forEach(function(d) {
-        dependencyQueuePush(Dependency.createFromObject(d, 'package.json'));
-      });
+      if( dependencies && Array.isArray(dependencies) && dependencies.length ) {
+        return packageJson.java.dependencies.forEach(function(d) {
+          dependencyQueuePush(Dependency.createFromObject(d, 'package.json'));
+        });
+      } else {
+        callback(null,{classpath:[]});
+      }
     });
   }
 
